@@ -10,7 +10,6 @@ from tqdm import tqdm
 import time
 
 logger = None
-import time
 
 def countdown(t):
 	while t:
@@ -20,66 +19,6 @@ def countdown(t):
 		time.sleep(1)
 		t -= 1
 	print('', end='\r')
-
-class Logger:
-	def __init__(self):
-		self.tab = 0
-	
-	def AddTab(self):
-		self.tab = self.tab + 1
-
-	def RemoveTab(self):
-		if self.tab > 0:
-			self.tab = self.tab - 1
-
-	def Print(self, msg, file=sys.stdout, end='\n', tab=True):
-		if tab:	
-			for i in range(0, self.tab):
-				print("  ", end='', file=file)
-		print(msg, file=file, end=end)
-
-class Downloader:
-	def __init__(self, url, name):
-		self.url  = url
-		self.filename = name
-
-	def download(self):
-		with open(self.filename, 'ab') as f:
-			headers = {}
-			pos = f.tell()
-			if pos:
-				headers['Range'] = 'bytes={0}-'.format(pos)
-			logger.Print("Getting headers ...")
-			response = requests.get(self.url, headers=headers, stream=True, timeout=60)
-			total_size = int(response.headers.get('content-length'))
-			if pos == total_size:
-				return True
-			logger.Print("Getting content ...")
-			with tqdm(total=total_size+pos, initial=pos, unit_scale=True, unit_divisor=1024, unit='B') as pbar:
-				for data in response.iter_content(chunk_size = 1024):
-					f.write(data)
-					pbar.update(1024)
-
-class GoGoAnime:
-	def __init__(self, url):
-		self.url = url
-
-	def grab(self, epNum):
-		epUrl = self.url + "/episode/episode-" + str(epNum)
-		logger.Print("Getting URL ... ")
-		epDownloadUrl = self._get_episode_download_url(epUrl)
-		if epDownloadUrl != "":
-			epUrl = epDownloadUrl
-		logger.Print("URL => {0}".format(epUrl))
-		return epUrl
-
-	def _get_episode_download_url(self, epUrl):
-		html_text = requests.get(epUrl).text
-		soup = bs4.BeautifulSoup(html_text, 'html.parser')
-		links = soup.find_all('a', text=re.compile(r'^Download$'))
-		for link in links:
-			return link.get('href')
-		return ""
 
 def str2List(_str):
 	strList = _str.strip().split(",")
@@ -97,37 +36,108 @@ def str2List(_str):
 		intList.append(rngNum)
 	return sorted(intList)
 
-def isFiller(epNum, fillerList):
-	for rng in fillerList:
-		if epNum in range(rng[0], rng[1] + 1):
-			return True
-	return False
+class LoggerC:
+	def __init__(self, file=sys.stdout):
+		self.m_tab  = 0
+		self.m_file = file 
+	
+	def AddTab(self):
+		self.m_tab = self.m_tab + 1
 
-def getEpisodeName(epNum, fillerList):
-	name = "episode_{0}".format(epNum)
-	if isFiller(epNum, fillerList):
-		name = name + "_filler"
-	name = name + ".mp4"
-	return name
+	def RemoveTab(self):
+		if self.m_tab > 0:
+			self.m_tab = self.m_tab - 1
+
+	def Print(self, msg, end='\n', tab=True):
+		if tab:
+			self.__printTabs()
+		print(msg, file=self.m_file, end=end)
+
+	def __printTabs(self):
+		for i in range(0, self.m_tab):
+			print("  ", end='', file=self.m_file)
+
+class DownloaderC:
+	def __init__(self, url, name):
+		self.m_url  = url
+		self.m_filename = name
+		self.m_chunk = 1024 
+
+	def Download(self):
+		if self.m_url == "":
+			return False
+		with open(self.m_filename, 'ab') as f:
+			headers = {}
+			pos = f.tell()
+			if pos:
+				headers['Range'] = 'bytes={0}-'.format(pos)
+			logger.Print("Getting headers ...")
+			response = requests.get(self.m_url, headers=headers, stream=True, timeout=60)
+			total_size = int(response.headers.get('content-length'))
+			logger.Print("Getting content ...")
+			with tqdm(total=total_size+pos, initial=pos, unit_scale=True, unit='B') as pbar:
+				for data in response.iter_content(chunk_size = self.m_chunk):
+					f.write(data)
+					pbar.update(self.m_chunk)
+		return True
+
+class GoGoAnimeC:
+	def __init__(self, url, fillerList):
+		self.m_url = url
+		self.m_fillerList = fillerList
+
+	def Grab(self, epNum):
+		epUrl = "{0}/episode/episode-{1}".format(self.m_url, epNum)
+		logger.Print("Getting URL ... ")
+		epUrl = self.__get_episode_download_url(epUrl)
+		if epUrl == "":
+			epUrl = "{0}/episode/episode-{1}-{2}".format(self.m_url, epNum, epNum+1)
+			epUrl = self.__get_episode_download_url(epUrl)
+		epName = self.__get_episode_name(epNum, epUrl)
+		logger.Print("URL => {0}, Name => {1}".format(epUrl, epName))
+		return epUrl, epName
+
+	def IsFiller(self, epNum):
+		for rng in self.m_fillerList:
+			if epNum in range(rng[0], rng[1] + 1):
+				return True
+		return False
+
+	def __get_episode_download_url(self, epUrl):
+		html_text = requests.get(epUrl).text
+		soup = bs4.BeautifulSoup(html_text, 'html.parser')
+		links = soup.find_all('a', text=re.compile(r'^Download$'))
+		for link in links:
+			return link.get('href')
+		return ""
+
+	def __get_episode_name(self, epNum, epUrl):
+		if "anime1.com" in epUrl:
+			return epUrl.split("?")[0].split("/")[-1]
+		name = "Episode_{0}".format(epNum)
+		if self.IsFiller(epNum):
+			name = name + "_filler"
+		name = name + ".mp4"
+		return name
 
 def main():
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-u", "--url",    help="URL of anime download page", dest="url",         required=True)    
-	parser.add_argument("-l", "--list",   help="List of episodes",           dest="list",        default="1-999")
-	parser.add_argument("-f", "--filler", help="List of filler episodes",    dest="fillerList",  default="0")
-#	parser.add_argument("-o", "--output", help="Output File",                dest="outFileName", default="anime_dl.txt")
+	parser.add_argument("-u", "--url"   , help="URL of anime download page"  , dest="url"       ,  required=True)    
+	parser.add_argument("-l", "--list"  , help="List of episodes, Ex.: 1,3-5", dest="list"      ,  default="1-999")
+	parser.add_argument("-f", "--filler", help="List of filler episodes"     , dest="fillerList",  default="0")
+	parser.add_argument("--skip-filler" , help="Skip downlading fillers"     , dest="skipFiller",  default=False, nargs='?', const=True)
 	args = parser.parse_args()
 	
 	url = args.url.lower()
+	fillerList = str2List(args.fillerList)
 	if "gogoanime" in url:
-		server = GoGoAnime(args.url)
+		server = GoGoAnimeC(args.url, fillerList)
 	else:
 		print("Error: URL not supported! Supported: GoGoAnime", file=sys.stderr)
 		return
 
 	global logger
-	logger = Logger()
-	fillerList = str2List(args.fillerList)
+	logger = LoggerC()
 	rngList = str2List(args.list)
 	rngLen = len(rngList)
 	rngCnt = 1
@@ -144,16 +154,19 @@ def main():
 			logger.Print("Episode ({0}/{1}) => {2} ... ".format(epCnt, epLen, epNum))
 			logger.AddTab()
 			epCnt = epCnt + 1
-			isFinished = False
-			while not isFinished:
-				try:
-					downloadUrl = server.grab(epNum)
-					dl = Downloader(downloadUrl, getEpisodeName(epNum, fillerList))
-					dl.download()
-					isFinished = True
-				except:
-					logger.Print("Error: Error processing episode {0}, Retrying after {1} seconds ...".format(epNum, wait))
-					countdown(wait)
+			if args.skipFiller and server.IsFiller(epNum):
+				logger.Print("Skipping filler episode.")
+			else:
+				isFinished = False
+				while not isFinished:
+					try:
+						dlUrl, dlName = server.Grab(epNum)
+						dl = DownloaderC(dlUrl, dlName)
+						dl.Download()
+						isFinished = True
+					except:
+						logger.Print("Error: Error processing episode {0}, Retrying after {1} seconds ...".format(epNum, wait))
+						countdown(wait)
 			logger.RemoveTab()
 		logger.RemoveTab()
 
