@@ -85,16 +85,22 @@ class GoGoAnimeC:
 	def __init__(self, url, fillerList):
 		self.m_url = url
 		self.m_fillerList = fillerList
+		self.m_pageAlt = 1
 
 	def Grab(self, epNum):
-		epUrl = "{0}/episode/episode-{1}".format(self.m_url, epNum)
 		logger.Print("Getting URL ... ")
-		epUrl = self.__get_episode_download_url(epUrl)
-		if epUrl == "":
-			epUrl = "{0}/episode/episode-{1}-{2}".format(self.m_url, epNum, epNum+1)
-			epUrl = self.__get_episode_download_url(epUrl)
+		pageResponse = self.__get_episode_page(epNum)
+		if pageResponse:
+			pageUrl =  pageResponse.url
+			epUrl   = self.__get_episode_download_url(pageResponse)
+			while epUrl == "":
+				pageResponse = self.__get_episode_alt_page(pageUrl)
+				if not pageResponse:
+					break
+				epUrl = sel.__get_episode_download_url(pageResponse)
 		epName = self.__get_episode_name(epNum, epUrl)
-		logger.Print("URL => {0}, Name => {1}".format(epUrl, epName))
+		logger.Print("URL  => {0}".format(epUrl))
+		logger.Print("Name => {0}".format(epName))
 		return epUrl, epName
 
 	def IsFiller(self, epNum):
@@ -103,12 +109,32 @@ class GoGoAnimeC:
 				return True
 		return False
 
-	def __get_episode_download_url(self, epUrl):
-		html_text = requests.get(epUrl).text
-		soup = bs4.BeautifulSoup(html_text, 'html.parser')
-		links = soup.find_all('a', text=re.compile(r'^Download$'))
-		for link in links:
-			return link.get('href')
+	def __get_response(self, url):
+		response = requests.get(url, timeout=60)
+		if response.status_code == 200 and response.url == url:
+			return response
+		return None
+
+	def __get_episode_page(self, epNum):
+		response = self.__get_response("{0}/episode/episode-{1}".format(self.m_url, epNum))
+		if not response:
+			response = self.__get_response("{0}/episode/episode-{1}-{2}".format(self.m_url, epNum, epNum+1))
+		if not response:
+			response = self.__get_response("{0}/episode/episode-{1}-{2}".format(self.m_url, epNum-1, epNum))
+		return response
+
+	def __get_episode_alt_page(self, pageUrl):
+		response = self.__get_response("{0}/{1}".format(pageUrl, self.m_pageAlt))
+		self.m_pageAlt = self.m_pageAlt + 1
+		return reponse
+	
+	def __get_episode_download_url(self, pageResponse):
+		if pageResponse:
+			html_text = pageResponse.text
+			soup = bs4.BeautifulSoup(html_text, 'html.parser')
+			links = soup.find_all('a', text=re.compile(r'^Download$'))
+			for link in links:
+				return link.get('href')
 		return ""
 
 	def __get_episode_name(self, epNum, epUrl):
