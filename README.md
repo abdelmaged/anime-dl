@@ -2,7 +2,9 @@
 CLI to download anime episodes from anime websites like GoGoAnime.
 
 Features:
-  - Download anime from GoGoAnime.
+  - Download anime from:
+    - GoGoAnime
+    - HorribleSubs (Requires [WeeChat] installed).
   - Support resume download.
 
 Examples:
@@ -15,4 +17,4 @@ Examples:
     ```console
     $ anime_dl.py --url https://www.gogoanime1.com/watch/naruto-shippuuden --list "1-500" --filler "28, 57-71, 91-112, 144-151, 170-171, 176-196, 223-242, 257-260, 271, 279-281, 284-295, 303-320, 347-361, 376-377, 389-390, 394-413, 416, 422-423, 427-450, 464-469, 480-483" --skip-filler
     ```
-    
+[weechat]: <https://weechat.org>
