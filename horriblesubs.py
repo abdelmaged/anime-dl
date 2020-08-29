@@ -54,22 +54,35 @@ class HorribleSubsC(AnimeBaseC):
 			link = soup.find('div', {"id": idStr})
 			if link:
 				xddLinks = link.find_all('a', text="XDCC")
+				epName = self.__get_ep_name(resolution, pageResponse.epNum)
 				for xdd in xddLinks:
 					xdccLink = xdd.get('href')
 					xdccSearch = xdccLink.split('=')[-1]
-					xdccResult = self.__get_xdcc_search(xdccSearch)
+					xdccResult = self.__get_xdcc_search(xdccSearch, epName)
 					return xdccResult, xdccResult['f']
 		return None, None
 
-	def __get_xdcc_search(self, text):
+	def __get_xdcc_search(self, text, epNameHint):
 		query = {'t': text}
 		query = urlencode(query, quote_via=quote_plus)
 		response = self.get_response("https://xdcc.horriblesubs.info/search.php?{0}".format(query))
 		if response:
-			resMatch = re.match(r"p\.k\[0\] = (.*);", response.text)
-			if resMatch:
-				result = resMatch.group(1)
-				result = js2json(result)
+			results = []
+			for resMatch in re.findall(r"p\.k\[\d+\] = (.*);", response.text):
+				result = js2json(resMatch)
 				result = json.loads(result)
-				return result
+				results.append(result)
+			if len(results) == 1:
+				return results[0]
+			else:
+				epNameHint = epNameHint.lower()
+				for result in results:
+					if epNameHint == result['f'].lower():
+						return result
+				return results[0]
+
 		return None
+	
+	def __get_ep_name(self, resolution, epNum):
+		title = self.m_url.split('/')[-1].replace('-', ' ')
+		return "[HorribleSubs] {0} - {1:02d} [{2}].mkv".format(title, epNum, resolution)
