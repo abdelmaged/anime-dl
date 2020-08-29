@@ -50,7 +50,7 @@ class HorribleSubsC(AnimeBaseC):
 			resolution = "720p"
 			if self.IsFiller(pageResponse.epNum):
 				resolution = "480p"
-			idStr = "{0}-{1}".format(pageResponse.epNum, resolution)
+			idStr = "{0:02d}-{1}".format(pageResponse.epNum, resolution)
 			link = soup.find('div', {"id": idStr})
 			if link:
 				xddLinks = link.find_all('a', text="XDCC")
