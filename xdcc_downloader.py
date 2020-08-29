@@ -10,14 +10,14 @@ class XDCCDownloaderC:
 		if not self.m_xdcc:
 			return False
 		dlPath = os.getcwd()
-		shellCommand = [
-			'xterm', 
-			'-e'
-		]
+		# shellCommand = [
+		# 	'xterm', 
+		# 	'-e'
+		# ]
 		command = [
 			'weechat', 
 			'-r', 
-			'"'
+			# '"'
 		]
 		weechatCommands = [
 			'/set xfer.file.auto_accept_files on',
@@ -35,7 +35,7 @@ class XDCCDownloaderC:
 		weechatCommands.append('\;'.join(onJoinCommands))
 		weechatCommands.append('/connect AnimeDLRizon')
 		command.append(';'.join(weechatCommands))
-		command.append('"')
-		shellCommand.append(' '.join(command))
-		subprocess.run(shellCommand)
+		# command.append('"')
+		# shellCommand.append(' '.join(command))
+		subprocess.run(command)
 		return os.path.isfile(self.m_xdcc['f'])
