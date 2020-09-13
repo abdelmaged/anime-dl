@@ -51,15 +51,16 @@ class HorribleSubsC(AnimeBaseC):
 			if self.IsFiller(pageResponse.epNum):
 				resolution = "480p"
 			idStr = "{0:02d}-{1}".format(pageResponse.epNum, resolution)
-			link = soup.find('div', {"id": idStr})
-			if link:
+			links = soup.find_all('div', id=idStr)
+			for link in links:
 				xddLinks = link.find_all('a', text="XDCC")
 				epName = self.__get_ep_name(resolution, pageResponse.epNum)
 				for xdd in xddLinks:
 					xdccLink = xdd.get('href')
 					xdccSearch = xdccLink.split('=')[-1]
 					xdccResult = self.__get_xdcc_search(xdccSearch, epName)
-					return xdccResult, xdccResult['f']
+					if xdccResult:
+						return xdccResult, xdccResult['f']
 		return None, None
 
 	def __get_xdcc_search(self, text, epNameHint):
@@ -79,7 +80,7 @@ class HorribleSubsC(AnimeBaseC):
 				for result in results:
 					if epNameHint == result['f'].lower():
 						return result
-				return results[0]
+				return None
 
 		return None
 	
