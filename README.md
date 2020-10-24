@@ -5,6 +5,7 @@ Features:
   - Download anime from:
     - GoGoAnime
     - HorribleSubs (Requires [WeeChat] installed).
+    - 4Anime
   - Support resume download.
 
 Examples:

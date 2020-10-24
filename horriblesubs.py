@@ -9,7 +9,7 @@ from urllib.parse import urlencode, quote_plus
 class HorribleSubsC(AnimeBaseC):
 	def __init__(self, url, fillerList):
 		super().__init__(url, fillerList)
-		self.m_showId = self.__get_show_id()
+		self.m_showId, self.m_showTitle = self.__get_show_info()
 
 	def Grab(self, epNum):
 		logger.Print("Getting URL ... ")
@@ -18,15 +18,23 @@ class HorribleSubsC(AnimeBaseC):
 			epUrl, epName = self.__get_episode_download_url(pageResponse)
 			return epUrl, epName
 
-	def __get_show_id(self):
+	def __get_show_info(self):
 		urlResponse = self.get_response(self.m_url)
 		if(urlResponse):
 			soup = bs4.BeautifulSoup(urlResponse.text, 'html.parser')
 			links = soup.find_all('script', text=re.compile(r'^var hs_showid'))
+			id = ""
 			for link in links:
 				hsMatch = re.match(r"^var hs_showid = (\d+)", link.text)
 				if hsMatch:
-					return hsMatch.group(1)
+					id = hsMatch.group(1)
+					break
+			title = ""
+			heads = soup.find_all('h1')
+			for head in heads:
+				title = head.getText()
+				break
+			return id, title
 		return ""
 
 	def __get_episode_page(self, epNum):
@@ -85,5 +93,4 @@ class HorribleSubsC(AnimeBaseC):
 		return None
 	
 	def __get_ep_name(self, resolution, epNum):
-		title = self.m_url.split('/')[-1].replace('-', ' ')
-		return "[HorribleSubs] {0} - {1:02d} [{2}].mkv".format(title, epNum, resolution)
+		return "[HorribleSubs] {0} - {1:02d} [{2}].mkv".format(self.m_showTitle, epNum, resolution)

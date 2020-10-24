@@ -5,6 +5,7 @@ import re
 import sys
 from utils import str2List, logger, countdown
 from gogoanime import GoGoAnimeC
+from four_anime import FourAnimeC
 from horriblesubs import HorribleSubsC
 from direct_downloader import DownloaderC
 from xdcc_downloader import XDCCDownloaderC
@@ -27,6 +28,8 @@ def main():
 	elif "horriblesubs" in url:
 		server = HorribleSubsC(args.url, fillerList)
 		isXDCC = True
+	elif "4anime" in url:
+		server = FourAnimeC(args.url, fillerList)
 	else:
 		print("Error: URL not supported! Supported: GoGoAnime", file=sys.stderr)
 		return
