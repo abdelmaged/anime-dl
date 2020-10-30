@@ -3,7 +3,7 @@ import re
 from anime_base import AnimeBaseC
 from logger import logger
 
-class FourAnimeC(AnimeBaseC):
+class AnimekisaC(AnimeBaseC):
 	def __init__(self, url, fillerList):
 		super().__init__(url, fillerList)
 
@@ -17,29 +17,35 @@ class FourAnimeC(AnimeBaseC):
 		return "", ""
 
 	def __get_episode_page(self, epNum):
-		url = self.m_url.replace("/anime/", "/")
-		response = self.get_response("{0}-episode-{1:02d}".format(url, epNum))
+		response = self.get_response("{0}-episode-{1}".format(self.m_url, epNum))
 		if not response:
-			response = self.get_response("{0}-episode-{1}".format(url, epNum))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(url, epNum, epNum+1))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(url, epNum-1, epNum))
+			response = self.get_response("{0}-episode-{1:02d}".format(self.m_url, epNum))
 		return response
 	
 	def __get_episode_download_url(self, pageResponse):
 		if pageResponse:
 			html_text = pageResponse.text
 			soup = bs4.BeautifulSoup(html_text, 'html.parser')
-			scripts = soup.find_all('script', {"type":"text/javascript"})
+			scripts = soup.find_all('script')
 			for script in scripts:
-				if "mirror_dl" in script.text:
-					return script.text.split('"')[3].replace('\\', '')
+				dlLink = re.search(r"var VidStreaming = \"(.*)\"", script.text)
+				if dlLink:
+					dlUrl = dlLink.group(1).replace("load.php", "download") 
+					response = self.get_response(dlUrl)
+					if(response):
+						html_text = response.text
+						soup = bs4.BeautifulSoup(html_text, 'html.parser')
+						self.name = soup.find(id="title")
+						links = soup.find_all('div', {"class":"dowload"})
+						for link in links:
+							dlLink = link.find('a')
+							if(dlLink):
+								return dlLink.get('href')
 		return ""
 
 	def __get_episode_name(self, epNum, epUrl):
-		if any(tag in epUrl for tag in ["googleapis", "4animu"]):
-			return epUrl.split("?")[0].split("/")[-1]
+		if(self.name):
+			return self.name.text
 		name = "Episode_{0}".format(epNum)
 		if self.IsFiller(epNum):
 			name = name + "_filler"
