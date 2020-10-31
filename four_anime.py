@@ -18,14 +18,7 @@ class FourAnimeC(AnimeBaseC):
 
 	def __get_episode_page(self, epNum):
 		url = self.m_url.replace("/anime/", "/")
-		response = self.get_response("{0}-episode-{1:02d}".format(url, epNum))
-		if not response:
-			response = self.get_response("{0}-episode-{1}".format(url, epNum))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(url, epNum, epNum+1))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(url, epNum-1, epNum))
-		return response
+		return super().__get_episode_page(url, epNum)
 	
 	def __get_episode_download_url(self, pageResponse):
 		if pageResponse:
@@ -36,12 +29,3 @@ class FourAnimeC(AnimeBaseC):
 				if "mirror_dl" in script.text:
 					return script.text.split('"')[3].replace('\\', '')
 		return ""
-
-	def __get_episode_name(self, epNum, epUrl):
-		if any(tag in epUrl for tag in ["googleapis", "4animu"]):
-			return epUrl.split("?")[0].split("/")[-1]
-		name = "Episode_{0}".format(epNum)
-		if self.IsFiller(epNum):
-			name = name + "_filler"
-		name = name + ".mp4"
-		return name

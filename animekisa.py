@@ -17,10 +17,7 @@ class AnimekisaC(AnimeBaseC):
 		return "", ""
 
 	def __get_episode_page(self, epNum):
-		response = self.get_response("{0}-episode-{1}".format(self.m_url, epNum))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}".format(self.m_url, epNum))
-		return response
+		return super().__get_episode_page(self.m_url, epNum)
 	
 	def __get_episode_download_url(self, pageResponse):
 		if pageResponse:
@@ -46,8 +43,4 @@ class AnimekisaC(AnimeBaseC):
 	def __get_episode_name(self, epNum, epUrl):
 		if(self.name):
 			return self.name.text
-		name = "Episode_{0}".format(epNum)
-		if self.IsFiller(epNum):
-			name = name + "_filler"
-		name = name + ".mp4"
-		return name
+		return super().__get_episode_name(epNum, epUrl)
