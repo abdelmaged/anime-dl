@@ -19,11 +19,11 @@ class GoGoAnimeC(AnimeBaseC):
 				if not pageResponse:
 					break
 				epUrl = self.__get_episode_download_url(pageResponse)
-		epName = self.__get_episode_name(epNum, epUrl)
+		epName = self.get_episode_name(epNum, epUrl)
 		return epUrl, epName
 
 	def __get_episode_page(self, epNum):
-		return super().__get_episode_page(self.m_url, epNum)
+		return super().get_episode_page(self.m_url, epNum)
 
 	def __get_episode_alt_page(self, pageUrl):
 		response = self.get_response("{0}/{1}".format(pageUrl, self.m_pageAlt))

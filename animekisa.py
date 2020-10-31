@@ -17,7 +17,7 @@ class AnimekisaC(AnimeBaseC):
 		return "", ""
 
 	def __get_episode_page(self, epNum):
-		return super().__get_episode_page(self.m_url, epNum)
+		return super().get_episode_page(self.m_url, epNum)
 	
 	def __get_episode_download_url(self, pageResponse):
 		if pageResponse:
@@ -43,4 +43,4 @@ class AnimekisaC(AnimeBaseC):
 	def __get_episode_name(self, epNum, epUrl):
 		if(self.name):
 			return self.name.text
-		return super().__get_episode_name(epNum, epUrl)
+		return super().get_episode_name(epNum, epUrl)

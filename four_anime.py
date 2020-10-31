@@ -12,13 +12,13 @@ class FourAnimeC(AnimeBaseC):
 		pageResponse = self.__get_episode_page(epNum)
 		if pageResponse:
 			epUrl  = self.__get_episode_download_url(pageResponse)
-			epName = self.__get_episode_name(epNum, epUrl)
+			epName = self.get_episode_name(epNum, epUrl)
 			return epUrl, epName
 		return "", ""
 
 	def __get_episode_page(self, epNum):
 		url = self.m_url.replace("/anime/", "/")
-		return super().__get_episode_page(url, epNum)
+		return super().get_episode_page(url, epNum)
 	
 	def __get_episode_download_url(self, pageResponse):
 		if pageResponse:

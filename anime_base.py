@@ -17,7 +17,7 @@ class AnimeBaseC:
 			return response
 		return None
 
-	def __get_episode_name(self, epNum, epUrl):
+	def get_episode_name(self, epNum, epUrl):
 		if any(tag in epUrl for tag in ["anime1.com", "googleapis", "4animu"]):
 			return epUrl.split("?")[0].split("/")[-1]
 		name = "Episode_{0}".format(epNum)
@@ -26,7 +26,7 @@ class AnimeBaseC:
 		name = name + ".mp4"
 		return name
 
-	def __get_episode_page(self, epUrl, epNum):
+	def get_episode_page(self, epUrl, epNum):
 		response = self.get_response("{0}-episode-{1:02d}".format(epUrl, epNum))
 		if not response:
 			response = self.get_response("{0}-episode-{1}".format(epUrl, epNum))
