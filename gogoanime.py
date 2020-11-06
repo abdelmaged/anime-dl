@@ -10,6 +10,7 @@ class GoGoAnimeC(AnimeBaseC):
 
 	def Grab(self, epNum):
 		logger.Print("Getting URL ... ")
+		epUrl = ""
 		pageResponse = self.__get_episode_page(epNum)
 		if pageResponse:
 			pageUrl =  pageResponse.url
@@ -23,7 +24,12 @@ class GoGoAnimeC(AnimeBaseC):
 		return epUrl, epName
 
 	def __get_episode_page(self, epNum):
-		return super().get_episode_page(self.m_url, epNum)
+		response = self.get_response("{0}/episode/episode-{1}".format(self.m_url, epNum))
+		if not response:
+			response = self.get_response("{0}/episode/episode-{1}-{2}".format(self.m_url, epNum, epNum+1))
+		if not response:
+			response = self.get_response("{0}/episode/episode-{1}-{2}".format(self.m_url, epNum-1, epNum))
+		return response
 
 	def __get_episode_alt_page(self, pageUrl):
 		response = self.get_response("{0}/{1}".format(pageUrl, self.m_pageAlt))

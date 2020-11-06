@@ -33,5 +33,9 @@ class AnimeBaseC:
 		if not response:
 			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(epUrl, epNum, epNum+1))
 		if not response:
+			response = self.get_response("{0}-episode-{1}-{2}".format(epUrl, epNum, epNum+1))
+		if not response:
 			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(epUrl, epNum-1, epNum))
+		if not response:
+			response = self.get_response("{0}-episode-{1}-{2}".format(epUrl, epNum-1, epNum))
 		return response
