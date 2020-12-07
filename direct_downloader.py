@@ -3,7 +3,7 @@ from tqdm import tqdm
 from logger import logger
 import string
 
-tbl = dict((ord(char), None) for char in string.punctuation)
+tbl = dict((ord(char), None) for char in "\\:?/*<>\"|")
 
 class DownloaderC:
 	def __init__(self, url, name):
