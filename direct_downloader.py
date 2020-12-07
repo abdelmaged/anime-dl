@@ -1,11 +1,14 @@
 import requests
 from tqdm import tqdm
 from logger import logger
+import string
+
+tbl = dict((ord(char), None) for char in string.punctuation)
 
 class DownloaderC:
 	def __init__(self, url, name):
 		self.m_url  = url
-		self.m_filename = name
+		self.m_filename = name.translate(tbl)
 		self.m_chunk = 1024 
 
 	def Download(self):

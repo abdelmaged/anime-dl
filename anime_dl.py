@@ -74,7 +74,8 @@ def main():
 						if(not isFinished):
 							logger.Print("Error: Error processing episode {0}, Retrying after {1} seconds ...".format(epNum, wait))
 							countdown(wait)	
-					except:
+					except Exception as e:
+						logger.Print(e)
 						logger.Print("Error: Error processing episode {0}, Retrying after {1} seconds ...".format(epNum, wait))
 						countdown(wait)
 			logger.RemoveTab()
