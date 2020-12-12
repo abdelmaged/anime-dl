@@ -8,10 +8,9 @@ from gogoanime import GoGoAnimeC
 from four_anime import FourAnimeC
 from animekisa import AnimekisaC
 from horriblesubs import HorribleSubsC
+from subsplease import SubsPleaseC
 from direct_downloader import DownloaderC
 from xdcc_downloader import XDCCDownloaderC
-
-
 
 def main():
 	parser = argparse.ArgumentParser()
@@ -33,8 +32,11 @@ def main():
 		server = FourAnimeC(args.url, fillerList)
 	elif "animekisa" in url:
 		server = AnimekisaC(args.url, fillerList)
+	elif "subsplease" in url:
+		server = SubsPleaseC(args.url, fillerList)
+		isXDCC = True
 	else:
-		print("Error: URL not supported! Supported: GoGoAnime", file=sys.stderr)
+		print("Error: URL not supported!", file=sys.stderr)
 		return
 
 	rngList = str2List(args.list)

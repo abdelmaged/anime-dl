@@ -7,6 +7,7 @@ Features:
     - [HorribleSubs] (Requires [WeeChat] installed). RIP.
     - [4Anime]
     - [Animekisa]
+    - [SubsPlease] (Requires [WeeChat] installed).
   - Support resume download.
 
 Examples:
@@ -24,3 +25,4 @@ Examples:
 [HorribleSubs]: <https://horriblesubs.info>
 [4Anime]: <https://4anime.to>
 [Animekisa]: <https://animekisa.tv>
+[SubsPlease]: <https://subsplease.org>
