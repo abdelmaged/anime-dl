@@ -1,4 +1,5 @@
 import requests
+from logger import logger
 
 class AnimeBaseC:
 	def __init__(self, url, fillerList):
@@ -11,10 +12,14 @@ class AnimeBaseC:
 				return True
 		return False
 
+	def Search(self, text):
+		return ""
+	
 	def get_response(self, url):
-		response = requests.get(url, timeout=60)
-		if response.status_code == 200 and url in response.url:
-			return response
+		if url:
+			response = requests.get(url, timeout=60)
+			if response.status_code == 200 and url in response.url:
+				return response
 		return None
 
 	def get_episode_name(self, epNum, epUrl):
@@ -26,16 +31,31 @@ class AnimeBaseC:
 		name = name + ".mp4"
 		return name
 
-	def get_episode_page(self, epUrl, epNum):
+	def get_episode_page(self, epUrl, epNum, double=True):
 		response = self.get_response("{0}-episode-{1:02d}".format(epUrl, epNum))
 		if not response:
 			response = self.get_response("{0}-episode-{1}".format(epUrl, epNum))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(epUrl, epNum, epNum+1))
-		if not response:
-			response = self.get_response("{0}-episode-{1}-{2}".format(epUrl, epNum, epNum+1))
-		if not response:
-			response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(epUrl, epNum-1, epNum))
-		if not response:
-			response = self.get_response("{0}-episode-{1}-{2}".format(epUrl, epNum-1, epNum))
+		if double:
+			if not response:
+				response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(epUrl, epNum, epNum+1))
+			if not response:
+				response = self.get_response("{0}-episode-{1}-{2}".format(epUrl, epNum, epNum+1))
+			if not response:
+				response = self.get_response("{0}-episode-{1:02d}-{2:02d}".format(epUrl, epNum-1, epNum))
+			if not response:
+				response = self.get_response("{0}-episode-{1}-{2}".format(epUrl, epNum-1, epNum))
 		return response
+
+	def get_user_selection(self, animeSet):
+		cnt = 0
+		for name in animeSet:
+			cnt += 1
+			logger.Print("{0}) {1}".format(cnt, name))
+		while True:
+			try:
+				sel = int(input("Select: "))
+				if sel < 1 or sel > cnt:
+					raise ValueError
+				return sel
+			except ValueError:
+				logger.Print("Invalid selection.")

@@ -2,10 +2,14 @@ import bs4
 import re
 from anime_base import AnimeBaseC
 from logger import logger
+from urllib.parse import urlencode, quote_plus
 
 class FourAnimeC(AnimeBaseC):
 	def __init__(self, url, fillerList):
 		super().__init__(url, fillerList)
+
+	def Name(self):
+		return "4Anime"
 
 	def Grab(self, epNum):
 		logger.Print("Getting URL ... ")
@@ -15,6 +19,32 @@ class FourAnimeC(AnimeBaseC):
 			epName = self.get_episode_name(epNum, epUrl)
 			return epUrl, epName
 		return "", ""
+
+
+	def Search(self, text):
+		query = {
+			's': text
+		}
+		query = urlencode(query, quote_via=quote_plus)
+		response = self.get_response("https://4anime.to/?{0}".format(query))
+		if response:
+			soup = bs4.BeautifulSoup(response.text, 'html.parser')
+			table = soup.find_all('div', {"id": "headerDIV_2"})
+			pages = {}
+			for tbl in table:
+				links = tbl.find_all('a')
+				for link in links:
+					href = link.get('href')
+					if href and len(href) > 1:
+						title = link.find('div')
+						if title:
+							pages[href] = title.text
+			keys, values = list(pages.keys()), list(pages.values())
+			if len(keys) == 1:
+				return keys[0]
+			else:
+				return keys[self.get_user_selection(values) - 1]
+		return ""
 
 	def __get_episode_page(self, epNum):
 		url = self.m_url.replace("/anime/", "/")

@@ -10,7 +10,9 @@ class SubsPleaseC(AnimeBaseC):
 	def __init__(self, url, fillerList):
 		super().__init__(url, fillerList)
 		self.m_showId, self.m_showTitle = self.__get_show_info()
-		print(self.m_showId, self.m_showTitle)
+
+	def Name(self):
+		return "SubsPlease"
 
 	def Grab(self, epNum):
 		logger.Print("Getting URL ... ")
@@ -18,6 +20,28 @@ class SubsPleaseC(AnimeBaseC):
 		if pageResponse:
 			epUrl, epName = self.__get_episode_download_url(pageResponse)
 			return epUrl, epName
+
+	def Search(self, text):
+		query = {
+			'f' : 'search', 
+			's' : text, 
+			'tz': 'eg'
+		}
+		query = urlencode(query, quote_via=quote_plus)
+		response = self.get_response("https://subsplease.org/api/?{0}".format(query))
+		if response and response.text:
+			jresult = json.loads(response.text)
+			if jresult:
+				pages = {}
+				for val in jresult.values():
+					if 'page' in val:
+						pages[val['page']] = val['show']
+				keys, values = list(pages.keys()), list(pages.values())
+				if len(keys) == 1:
+					return "https://subsplease.org/shows/{0}".format(keys[0])
+				else:
+					return "https://subsplease.org/shows/{0}".format(keys[self.get_user_selection(values) - 1])
+		return ""
 
 	def __get_show_info(self):
 		urlResponse = self.get_response(self.m_url)
@@ -33,7 +57,7 @@ class SubsPleaseC(AnimeBaseC):
 				title = head.getText()
 				break
 			return id, title
-		return ""
+		return "", ""
 
 	def __get_episode_page(self, epNum):
 		query = {
