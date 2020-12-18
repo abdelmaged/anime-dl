@@ -32,4 +32,3 @@ Examples:
 [Animekisa]: <https://animekisa.tv>
 [SubsPlease]: <https://subsplease.org>
 
-<meta name="google-site-verification" content="QtWjzzZbReu4weB-Hb7h0nR1V_DNCVb2Ao4jPferTAY" />
