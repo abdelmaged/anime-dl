@@ -22,6 +22,8 @@ class DownloaderC:
 			logger.Print("Getting headers ...")
 			response = requests.get(self.m_url, headers=headers, stream=True, timeout=60)
 			total_size = int(response.headers.get('content-length'))
+			if total_size < 512:
+				return False
 			logger.Print("Getting content ...")
 			with tqdm(total=total_size+pos, initial=pos, unit_scale=True, unit='B') as pbar:
 				for data in response.iter_content(chunk_size = self.m_chunk):

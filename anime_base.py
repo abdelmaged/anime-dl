@@ -1,5 +1,6 @@
 import requests
 from logger import logger
+from utils import similar
 
 class AnimeBaseC:
 	def __init__(self, url, fillerList):
@@ -18,7 +19,7 @@ class AnimeBaseC:
 	def get_response(self, url):
 		if url:
 			response = requests.get(url, timeout=60)
-			if response.status_code == 200 and url in response.url:
+			if response.status_code == 200 and similar(url, response.url) > 0.80:
 				return response
 		return None
 
@@ -49,6 +50,8 @@ class AnimeBaseC:
 	def get_user_selection(self, animeSet):
 		cnt = 0
 		for name in animeSet:
+			if cnt > 4:
+				break
 			cnt += 1
 			logger.Print("{0}) {1}".format(cnt, name))
 		while True:

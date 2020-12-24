@@ -1,3 +1,6 @@
+#! /usr/bin/python3
+
+import argparse
 import subprocess
 import os
 
@@ -39,3 +42,16 @@ class XDCCDownloaderC:
 		# shellCommand.append(' '.join(command))
 		subprocess.run(command)
 		return os.path.isfile(self.m_xdcc['f'])
+
+def main():
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-b", "--bot" , help="Bot", dest="bot")
+	parser.add_argument("-n", "--nick", help="Nick", dest="nick")
+	args = parser.parse_args()
+
+	xdcc = {'n': args.nick, 'b': args.bot, 'f': 'name'}
+	dl = XDCCDownloaderC(xdcc, "")
+	dl.Download()
+
+if __name__ == "__main__":
+	main()

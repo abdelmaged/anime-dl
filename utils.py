@@ -2,6 +2,7 @@ import time
 import sys
 import re
 from logger import logger
+from difflib import SequenceMatcher
 
 def countdown(t):
 	while t:
@@ -32,3 +33,6 @@ def js2json(js):
 	pattern = r"([a-zA-Z_][a-zA-Z_0-9]*)\s*\:"	
 	repl = lambda match: '"{}":'.format(match.group(1))
 	return re.sub(pattern, repl, js)
+
+def similar(a, b):
+	return SequenceMatcher(None, a, b).ratio()

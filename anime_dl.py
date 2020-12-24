@@ -3,20 +3,23 @@
 import argparse
 import re
 import sys
+
 from utils import str2List, logger, countdown
+
 from gogoanime import GoGoAnimeC
 from four_anime import FourAnimeC
 from animekisa import AnimekisaC
 from horriblesubs import HorribleSubsC
 from subsplease import SubsPleaseC
+
 from direct_downloader import DownloaderC
 from xdcc_downloader import XDCCDownloaderC
 
 def search(text):
 	providers = [
-		AnimekisaC("", []), 
-		FourAnimeC("", []), 
-		GoGoAnimeC("", []), 
+		AnimekisaC("", []),
+		FourAnimeC("", []),
+		GoGoAnimeC("", []),
 		SubsPleaseC("", [])
 	]
 	while True:
@@ -25,7 +28,7 @@ def search(text):
 			logger.AddTab()
 			url = provider.Search(text)
 			if url:
-				logger.Print("Found URL: {0}".format(url))
+				logger.Print("Found Provider: {0}".format(url))
 				yield url
 			logger.RemoveTab()
 
@@ -100,7 +103,7 @@ def main():
 						else:
 							if urlGen:
 								notFoundCnt += 1
-								if notFoundCnt > 4:
+								if notFoundCnt > 3:
 									logger.Print("Not Found, skipping episode!")
 									break
 								server, isXDCC = GetServer(next(urlGen), fillerList)
@@ -114,8 +117,16 @@ def main():
 							dl = DownloaderC(dlUrl, dlName)
 						isFinished = dl.Download()
 						if(not isFinished):
-							logger.Print("Error: Error processing episode {0}, Retrying after {1} seconds ...".format(epNum, wait))
-							countdown(wait)	
+							if urlGen:
+								notFoundCnt += 1
+								if notFoundCnt > 3:
+									logger.Print("Not Found, skipping episode!")
+									break
+								server, isXDCC = GetServer(next(urlGen), fillerList)
+								continue
+							else:
+								logger.Print("Not Found, skipping episode!")
+								break
 					except Exception as e:
 						logger.Print(e)
 						logger.Print("Error: Error processing episode {0}, Retrying after {1} seconds ...".format(epNum, wait))

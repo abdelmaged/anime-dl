@@ -7,6 +7,7 @@ from urllib.parse import urlencode, quote_plus
 class AnimekisaC(AnimeBaseC):
 	def __init__(self, url, fillerList):
 		super().__init__(url, fillerList)
+		self.name = None
 
 	def Name(self):
 		return "AnimeKisa"
@@ -75,5 +76,5 @@ class AnimekisaC(AnimeBaseC):
 
 	def __get_episode_name(self, epNum, epUrl):
 		if(self.name):
-			return self.name.text
+			return self.name.text + ".mp4"
 		return super().get_episode_name(epNum, epUrl)
