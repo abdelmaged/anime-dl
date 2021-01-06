@@ -66,6 +66,7 @@ def main():
 		urlGen = search(args.search)
 		server, isXDCC = None, False
 	else:
+		urlGen = None
 		url = args.url.lower()
 		server, isXDCC = GetServer(url, fillerList)
 		if not server:

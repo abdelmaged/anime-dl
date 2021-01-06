@@ -40,10 +40,11 @@ class FourAnimeC(AnimeBaseC):
 						if title:
 							pages[href] = title.text
 			keys, values = list(pages.keys()), list(pages.values())
+			if len(keys) == 0:
+				return ""
 			if len(keys) == 1:
 				return keys[0]
-			else:
-				return keys[self.get_user_selection(values) - 1]
+			return keys[self.get_user_selection(values) - 1]
 		return ""
 
 	def __get_episode_page(self, epNum):

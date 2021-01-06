@@ -43,10 +43,11 @@ class AnimekisaC(AnimeBaseC):
 								if title:
 									pages[href] = title.text
 						keys, values = list(pages.keys()), list(pages.values())
+						if len(keys) == 0:
+							return ""
 						if len(keys) == 1:
 							return "https://animekisa.tv{0}".format(keys[0])
-						else:
-							return "https://animekisa.tv{0}".format(keys[self.get_user_selection(values) - 1])
+						return "https://animekisa.tv{0}".format(keys[self.get_user_selection(values) - 1])
 					break
 		return ""
 
@@ -61,17 +62,19 @@ class AnimekisaC(AnimeBaseC):
 			for script in scripts:
 				dlLink = re.search(r"var VidStreaming = \"(.*)\"", script.text)
 				if dlLink:
-					dlUrl = dlLink.group(1).replace("load.php", "download") 
+					dlUrl = dlLink.group(1).replace("load.php", "download")
 					response = self.get_response(dlUrl)
 					if(response):
 						html_text = response.text
 						soup = bs4.BeautifulSoup(html_text, 'html.parser')
 						self.name = soup.find(id="title")
 						links = soup.find_all('div', {"class":"dowload"})
+						retLink = ""
 						for link in links:
 							dlLink = link.find('a')
-							if(dlLink):
-								return dlLink.get('href')
+							if dlLink and (retLink == "" or "720" in dlLink.text):
+								retLink = dlLink.get('href')
+						return retLink
 		return ""
 
 	def __get_episode_name(self, epNum, epUrl):
