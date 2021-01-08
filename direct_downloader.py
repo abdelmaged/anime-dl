@@ -2,6 +2,7 @@ import requests
 from tqdm import tqdm
 from logger import logger
 import string
+import os
 
 tbl = dict((ord(char), None) for char in "\\:?/*<>\"|")
 
@@ -14,7 +15,11 @@ class DownloaderC:
 	def Download(self):
 		if self.m_url == "":
 			return False
-		with open(self.m_filename, 'ab') as f:
+		if os.path.isfile(self.m_filename):
+			return True
+			
+		partName = self.m_filename + ".part"
+		with open(partName, 'ab') as f:
 			headers = {}
 			pos = f.tell()
 			if pos:
@@ -29,4 +34,5 @@ class DownloaderC:
 				for data in response.iter_content(chunk_size = self.m_chunk):
 					f.write(data)
 					pbar.update(self.m_chunk)
+		os.rename(partName, self.m_filename)
 		return True
