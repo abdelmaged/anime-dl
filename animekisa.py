@@ -52,6 +52,8 @@ class AnimekisaC(AnimeBaseC):
 		return ""
 
 	def __get_episode_page(self, epNum):
+		if epNum < len(self.m_episodes):
+			return self.get_response(self.m_episodes[-epNum])
 		return super().get_episode_page(self.m_url, epNum, double=False)
 	
 	def __get_episode_download_url(self, pageResponse):
@@ -81,3 +83,12 @@ class AnimekisaC(AnimeBaseC):
 		if(self.name):
 			return self.name.text + ".mp4"
 		return super().get_episode_name(epNum, epUrl)
+
+	def collect_episodes(self):
+		response = self.get_response(self.m_url)
+		if response:
+			soup = bs4.BeautifulSoup(response.text, 'html.parser')
+			links = soup.find_all('a', {"class":"infovan"})
+			for link in links:
+				self.m_episodes.append("https://animekisa.tv/" + link.get('href'))
+

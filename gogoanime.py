@@ -69,3 +69,18 @@ class GoGoAnimeC(AnimeBaseC):
 			for link in links:
 				return link.get('href')
 		return ""
+
+	def __get_episode_page(self, epNum):
+		if epNum < len(self.m_episodes):
+			return self.get_response(self.m_episodes[-epNum])
+		return super().get_episode_page(self.m_url, epNum)
+
+	def collect_episodes(self):
+		response = self.get_response(self.m_url)
+		if response:
+			soup = bs4.BeautifulSoup(response.text, 'html.parser')
+			uls = soup.find_all('ul', {"class":"check-list"})
+			if len(uls) > 1:
+				links = uls[1].find_all('a')
+				for link in links:
+					self.m_episodes.append(link.get('href'))

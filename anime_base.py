@@ -6,6 +6,8 @@ class AnimeBaseC:
 	def __init__(self, url, fillerList):
 		self.m_url = url
 		self.m_fillerList = fillerList
+		self.m_episodes = []
+		self.collect_episodes()
 
 	def IsFiller(self, epNum):
 		for rng in self.m_fillerList:
@@ -62,3 +64,12 @@ class AnimeBaseC:
 				return sel
 			except ValueError:
 				logger.Print("Invalid selection.")
+
+	def collect_episodes(self):
+		return
+
+	def EpisodesLen(self):
+		epLen = len(self.m_episodes) 
+		if epLen > 0:
+			return epLen
+		return 999

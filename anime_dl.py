@@ -15,13 +15,35 @@ from subsplease import SubsPleaseC
 from direct_downloader import DownloaderC
 from xdcc_downloader import XDCCDownloaderC
 
-def search(text):
+def GetSearchOrder():
 	providers = [
 		AnimekisaC("", []),
 		FourAnimeC("", []),
 		GoGoAnimeC("", []),
 		SubsPleaseC("", [])
 	]
+	cnt = 0
+	pLen = len(providers)
+	for provider in providers:
+		cnt += 1
+		logger.Print("{0}) {1}".format(cnt,provider.Name()))
+	orderList = input("Search Order [ENTER]: ").strip().split(" ")
+	newProviders = []
+	for order in orderList:
+		try:
+			orderNum = int(order) - 1
+			if orderNum >= 0 and orderNum < pLen and providers[orderNum] not in newProviders:
+				newProviders.append(providers[orderNum])
+		except ValueError:
+			pass
+	for provider in providers:
+		if provider not in newProviders:
+			newProviders.append(provider)
+	logger.Print(" -> ".join([x.Name() for x in newProviders]))
+	return newProviders
+
+def search(text):
+	providers = GetSearchOrder()
 	while True:
 		for provider in providers:
 			logger.Print("Searching in {0} ...".format(provider.Name()))
@@ -56,7 +78,7 @@ def main():
 	group = parser.add_mutually_exclusive_group(required=True)
 	group.add_argument("-u", "--url"   , help="URL of anime download page"  , dest="url")
 	group.add_argument("-s", "--search", help="Search by anime name"        , dest="search")
-	parser.add_argument("-l", "--list"  , help="List of episodes, Ex.: 1,3-5", dest="list"      ,  default="1-999")
+	parser.add_argument("-l", "--list"  , help="List of episodes, Ex.: 1,3-5", dest="list")
 	parser.add_argument("-f", "--filler", help="List of filler episodes"     , dest="fillerList",  default="0")
 	parser.add_argument("--skip-filler" , help="Skip downlading fillers"     , dest="skipFiller",  default=False, nargs='?', const=True)
 	args = parser.parse_args()
@@ -64,14 +86,15 @@ def main():
 	fillerList = str2List(args.fillerList)
 	if(args.search):
 		urlGen = search(args.search)
-		server, isXDCC = None, False
+		server, isXDCC = GetServer(next(urlGen), fillerList)
 	else:
 		urlGen = None
 		url = args.url.lower()
 		server, isXDCC = GetServer(url, fillerList)
 		if not server:
 			exit(1)
-
+	if(not args.list):
+		args.list = "1-{0}".format(server.EpisodesLen())
 	rngList = str2List(args.list)
 	rngLen = len(rngList)
 	rngCnt = 1

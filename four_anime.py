@@ -7,8 +7,6 @@ from urllib.parse import urlencode, quote_plus
 class FourAnimeC(AnimeBaseC):
 	def __init__(self, url, fillerList):
 		super().__init__(url, fillerList)
-		self.m_episodes = []
-		self.__collect_episodes()
 
 	def Name(self):
 		return "4Anime"
@@ -51,7 +49,7 @@ class FourAnimeC(AnimeBaseC):
 
 	def __get_episode_page(self, epNum):
 		if epNum < len(self.m_episodes):
-			return self.get_response(self.m_episodes[epNum])
+			return self.get_response(self.m_episodes[epNum - 1])
 		else:
 			url = self.m_url.replace("/anime/", "/")
 			return super().get_episode_page(url, epNum)
@@ -66,7 +64,7 @@ class FourAnimeC(AnimeBaseC):
 					return script.text.split('"')[3].replace('\\', '')
 		return ""
 
-	def __collect_episodes(self):
+	def collect_episodes(self):
 		response = self.get_response(self.m_url)
 		if response:
 			soup = bs4.BeautifulSoup(response.text, 'html.parser')
