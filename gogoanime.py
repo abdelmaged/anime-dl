@@ -57,6 +57,8 @@ class GoGoAnimeC(AnimeBaseC):
 		return response
 
 	def __get_episode_alt_page(self, pageUrl):
+		if self.m_pageAlt > 3:
+			return None
 		response = self.get_response("{0}/{1}".format(pageUrl, self.m_pageAlt))
 		self.m_pageAlt = self.m_pageAlt + 1
 		return response

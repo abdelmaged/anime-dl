@@ -77,15 +77,16 @@ class SubsPleaseC(AnimeBaseC):
 			resolution = "720"
 			if self.IsFiller(pageResponse.epNum):
 				resolution = "480"
-			for val in jresult.values():
-				if(val['episode'] == str(pageResponse.epNum)):
-					for link in val['downloads']:
-						if(link['res'] == resolution):
-							epName = self.__get_ep_name(resolution, pageResponse.epNum)
-							xdccResult = self.__get_xdcc_search(link['xdcc'], epName)
-							if xdccResult:
-								return xdccResult, xdccResult['f']
-					break
+			if 'episode' in jresult.keys():
+				for epName, epInfo in jresult['episode'].items():
+					if('episode' in epInfo.keys() and int(epInfo['episode']) == pageResponse.epNum):
+						for link in epInfo['downloads']:
+							if(link['res'] == resolution):
+								epName = self.__get_ep_name(resolution, pageResponse.epNum)
+								xdccResult = self.__get_xdcc_search(link['xdcc'], epName)
+								if xdccResult:
+									return xdccResult, xdccResult['f']
+						break
 		return None, None
 
 	def __get_xdcc_search(self, text, epNameHint):

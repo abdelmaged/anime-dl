@@ -74,7 +74,7 @@ class AnimekisaC(AnimeBaseC):
 						retLink = ""
 						for link in links:
 							dlLink = link.find('a')
-							if dlLink and (retLink == "" or "720" in dlLink.text):
+							if dlLink and (retLink == "" or "HDP" in dlLink.text): # 720 link is slow use HDP link instead
 								retLink = dlLink.get('href')
 						return retLink
 		return ""
