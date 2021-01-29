@@ -43,9 +43,11 @@ class GoGoAnimeC(AnimeBaseC):
 					keys.append(val['seo_name'])
 					values.append(val['name'])
 				if len(keys) == 1:
-					return "https://www.gogoanime1.com/watch/{0}".format(keys[0])
+					self.m_url = "https://www.gogoanime1.com/watch/{0}".format(keys[0])
 				else:
-					return "https://www.gogoanime1.com/watch/{0}".format(keys[self.get_user_selection(values) - 1])
+					self.m_url = "https://www.gogoanime1.com/watch/{0}".format(keys[self.get_user_selection(values) - 1])
+				self.collect_episodes()
+				return self.m_url
 		return ""
 
 	def __get_episode_page(self, epNum):
@@ -73,7 +75,7 @@ class GoGoAnimeC(AnimeBaseC):
 		return ""
 
 	def __get_episode_page(self, epNum):
-		if epNum < len(self.m_episodes):
+		if epNum <= len(self.m_episodes):
 			return self.get_response(self.m_episodes[-epNum])
 		return super().get_episode_page(self.m_url, epNum)
 
@@ -82,7 +84,12 @@ class GoGoAnimeC(AnimeBaseC):
 		if response:
 			soup = bs4.BeautifulSoup(response.text, 'html.parser')
 			uls = soup.find_all('ul', {"class":"check-list"})
-			if len(uls) > 1:
-				links = uls[1].find_all('a')
+			uls_len = len(uls)
+			if uls_len > 0:
+				if uls_len > 1:
+					ul_index = 1
+				else:
+					ul_index = 0
+				links = uls[ul_index].find_all('a')
 				for link in links:
 					self.m_episodes.append(link.get('href'))
