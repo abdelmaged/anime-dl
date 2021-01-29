@@ -11,14 +11,12 @@ from four_anime import FourAnimeC
 from animekisa import AnimekisaC
 from horriblesubs import HorribleSubsC
 from subsplease import SubsPleaseC
-from animeultima import AnimeUltimaC
 
 from direct_downloader import DownloaderC
 from xdcc_downloader import XDCCDownloaderC
 
 def GetSearchOrder():
 	providers = [
-		#AnimeUltimaC("", []),
 		AnimekisaC("", []),
 		FourAnimeC("", []),
 		GoGoAnimeC("", []),
@@ -71,8 +69,6 @@ def GetServer(url, fillerList):
 	elif "subsplease" in url:
 		server = SubsPleaseC(url, fillerList)
 		isXDCC = True
-	elif "animeultima" in url:
-		server = AnimeUltimaC(url, fillerList)
 	else:
 		print("Error: URL not supported!", file=sys.stderr)
 	return server, isXDCC

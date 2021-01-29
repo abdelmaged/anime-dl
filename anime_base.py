@@ -1,7 +1,6 @@
 import requests
 from logger import logger
 from utils import similar
-import json
 
 class AnimeBaseC:
 	def __init__(self, url, fillerList):
@@ -9,7 +8,6 @@ class AnimeBaseC:
 		self.m_fillerList = fillerList
 		self.m_episodes = []
 		self.collect_episodes()
-		self.session = None
 
 	def IsFiller(self, epNum):
 		for rng in self.m_fillerList:
@@ -27,41 +25,6 @@ class AnimeBaseC:
 				return response
 		return None
 
-	def get_response_cloud(self, url):
-		# if not self.session:
-		# 	headers = {
-		# 		'Content-Type': 'application/json',
-		# 	}
-		# 	data = { 
-		# 		"cmd": "sessions.create",
-		# 		"session": "my_cloud_1",
-		# 		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleW...", 
-		# 	}
-			
-		# 	response = requests.post('http://localhost:8191/v1', headers=headers, data=json.dumps(data))
-		# 	self.session = "my_cloud_1"
-
-		if url:
-			headers = {
-				'Content-Type': 'application/json',
-			}
-			data = { 
-				"cmd": "request.get", 
-				"url": url, 
-				"session": "my_cloud_1",
-				"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleW...", 
-				"maxTimeout": 60000, 
-				"headers": { 
-					"X-Test": "Testing 123..."
-				}
-			}
-			
-			response = requests.post('http://localhost:8191/v1', headers=headers, data=json.dumps(data))
-			if response.status_code == 200:
-				response = json.loads(response.text)
-				return response['solution']['response']
-		return None
-		
 	def get_episode_name(self, epNum, epUrl):
 		if any(tag in epUrl for tag in ["anime1.com", "googleapis", "4animu"]):
 			return epUrl.split("?")[0].split("/")[-1]
