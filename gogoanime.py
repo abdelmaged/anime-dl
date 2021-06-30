@@ -43,11 +43,12 @@ class GoGoAnimeC(AnimeBaseC):
 					keys.append(val['seo_name'])
 					values.append(val['name'])
 				if len(keys) == 1:
-					self.m_url = "https://www.gogoanime1.com/watch/{0}".format(keys[0])
+					return "https://www.gogoanime1.com/watch/{0}".format(keys[0])
 				else:
-					self.m_url = "https://www.gogoanime1.com/watch/{0}".format(keys[self.get_user_selection(values) - 1])
-				self.collect_episodes()
-				return self.m_url
+					user_sel = self.get_user_selection(values)
+					if user_sel == -1:
+							return ''
+					return 'https://www.gogoanime1.com/watch/{0}'.format(keys[(user_sel - 1)])
 		return ""
 
 	def __get_episode_page(self, epNum):

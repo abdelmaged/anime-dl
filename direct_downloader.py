@@ -4,8 +4,10 @@ import argparse
 import requests
 from tqdm import tqdm
 from logger import logger
+from utils import get_response
 import string
 import os
+import bs4
 
 tbl = dict((ord(char), None) for char in "\\:?/*<>\"|")
 
@@ -14,6 +16,9 @@ class DownloaderC:
 		self.m_url  = url
 		self.m_filename = name.translate(tbl)
 		self.m_chunk = 1024 
+		if 'sbplay' in self.m_url:
+				self.m_url = self.__extract_sbplay(self.m_url)
+
 
 	def Download(self):
 		if self.m_url == "":
@@ -39,6 +44,24 @@ class DownloaderC:
 					pbar.update(self.m_chunk)
 		os.rename(partName, self.m_filename)
 		return True
+
+	def __extract_sbplay(self, url):
+			response = get_response(url)
+			if response:
+					soup = bs4.BeautifulSoup(response.text, 'html.parser')
+					table = soup.find('table')
+					if table:
+							links = table.find_all('a')
+							if links:
+									code, mode, hash = links[(-1)].get('onclick').replace("'", '').split('(')[(-1)].split(')')[0].split(',')
+									url2 = 'https://sbplay.org/dl?op=download_orig&id={0}&mode={1}&hash={2}'.format(code, mode, hash)
+									response = get_response(url2)
+									if response:
+											soup = bs4.BeautifulSoup(response.text, 'html.parser')
+											link = soup.find(lambda tag: tag.name == 'a' and 'Direct Download Link' in tag.text)
+											if link:
+													return link.get('href')
+			return url
 
 def main():
 	parser = argparse.ArgumentParser()

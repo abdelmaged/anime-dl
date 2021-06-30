@@ -1,6 +1,7 @@
 import requests
 from logger import logger
 from utils import similar
+from utils import get_response
 
 class AnimeBaseC:
 	def __init__(self, url, fillerList):
@@ -19,11 +20,7 @@ class AnimeBaseC:
 		return ""
 	
 	def get_response(self, url):
-		if url:
-			response = requests.get(url, timeout=60)
-			if response.status_code == 200 and similar(url, response.url) > 0.80:
-				return response
-		return None
+		return get_response(url)
 
 	def get_episode_name(self, epNum, epUrl):
 		if any(tag in epUrl for tag in ["anime1.com", "googleapis", "4animu"]):
@@ -58,7 +55,10 @@ class AnimeBaseC:
 			logger.Print("{0}) {1}".format(cnt, name))
 		while True:
 			try:
-				sel = int(input("Select: "))
+				inp = input("Select (s to skip): ")
+				if inp == 's':
+					return -1
+				sel = int(inp)
 				if sel < 1 or sel > cnt:
 					raise ValueError
 				return sel

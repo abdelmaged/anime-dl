@@ -44,7 +44,10 @@ class FourAnimeC(AnimeBaseC):
 				return ""
 			if len(keys) == 1:
 				return keys[0]
-			return keys[self.get_user_selection(values) - 1]
+			user_sel = self.get_user_selection(values)
+			if user_sel == -1:
+					return ''
+			return keys[(user_sel - 1)]
 		return ""
 
 	def __get_episode_page(self, epNum):

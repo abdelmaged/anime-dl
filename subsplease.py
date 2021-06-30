@@ -40,7 +40,10 @@ class SubsPleaseC(AnimeBaseC):
 				if len(keys) == 1:
 					return "https://subsplease.org/shows/{0}".format(keys[0])
 				else:
-					return "https://subsplease.org/shows/{0}".format(keys[self.get_user_selection(values) - 1])
+					user_sel = self.get_user_selection(values)
+					if user_sel == -1:
+							return ''
+					return 'https://subsplease.org/shows/{0}'.format(keys[(user_sel - 1)])
 		return ""
 
 	def __get_show_info(self):

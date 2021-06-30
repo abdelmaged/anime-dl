@@ -3,6 +3,7 @@ import sys
 import re
 from logger import logger
 from difflib import SequenceMatcher
+import requests
 
 def countdown(t):
 	while t:
@@ -36,3 +37,10 @@ def js2json(js):
 
 def similar(a, b):
 	return SequenceMatcher(None, a, b).ratio()
+
+def get_response(url):
+	if url:
+		response = requests.get(url, timeout=60)
+		if response.status_code == 200:
+			if similar(url, response.url) > 0.8:
+				return response

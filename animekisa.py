@@ -47,7 +47,11 @@ class AnimekisaC(AnimeBaseC):
 							return ""
 						if len(keys) == 1:
 							return "https://animekisa.tv{0}".format(keys[0])
-						return "https://animekisa.tv{0}".format(keys[self.get_user_selection(values) - 1])
+						user_sel = self.get_user_selection(values)
+						if user_sel == -1:
+								return ''
+						return 'https://animekisa.tv{0}'.format(keys[(user_sel - 1)])
+
 					break
 		return ""
 
